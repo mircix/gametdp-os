@@ -67,16 +67,21 @@ On Windows, use [Fedora Media Writer](https://fedoraproject.org/workstation/down
 (choose *Select .iso file*) or [balenaEtcher](https://etcher.balena.io). Pick the ISO, pick the
 USB stick, write.
 
-### 4. Start the installer
+### 4. Turn Secure Boot off (for now) and start the installer
 
-1. Plug in the USB stick and restart.
-2. Tap the boot menu key while the PC starts: **F8** on most ASUS boards, **F11** on MSI and
+With Secure Boot on, many 2026 firmware versions stop the installer with *bad shim signature*
+(the same happens with Bazzite). Turn it off for the install; step 6 turns it back on.
+
+1. Restart and press **Del** (or F2) to open the BIOS. On ASUS boards: **F7** (Advanced Mode) →
+   **Boot** → **Secure Boot** → **OS Type** → **Other OS**. Press **F10** to save and restart.
+   Don't start Windows while Secure Boot is off: if BitLocker is on, it would ask for its
+   recovery key (you'd find it at https://aka.ms/myrecoverykey).
+2. Plug in the USB stick and restart.
+3. Tap the boot menu key while the PC starts: **F8** on most ASUS boards, **F11** on MSI and
    ASRock, **F12** on Gigabyte.
-3. Choose the entry that starts with **UEFI:** and names your USB stick.
-4. In the black menu that appears, choose **Install GameTDP OS 44** (if the screen stays black
+4. Choose the entry that starts with **UEFI:** and names your USB stick.
+5. In the black menu that appears, choose **Install GameTDP OS 44** (if the screen stays black
    after that, restart and pick *Install GameTDP OS 44 in basic graphics mode*).
-
-Leave Secure Boot as it is; step 6 takes care of it.
 
 ### 5. In the installer
 
@@ -87,21 +92,21 @@ Leave Secure Boot as it is; step 6 takes care of it.
 3. Set the time zone, then **Begin Installation**. When it finishes, click **Reboot** and pull
    out the USB stick.
 
-### 6. First restart: the blue screen (Secure Boot)
+### 6. Turn Secure Boot back on
 
-If your PC has Secure Boot on (Windows 11 PCs usually do), a blue **Perform MOK management**
-screen appears once. It needs a keyboard:
+If a blue **Perform MOK management** screen appears on the first restart, choose
+**Continue boot** for now. Then, once GameTDP OS has started:
 
-1. **Enroll MOK** → **Continue** → **Yes**
-2. Type the password **`universalblue`** (nothing shows while you type) and press Enter.
-3. **Reboot**.
+1. Open **Konsole** and run `ujust enroll-secure-boot-key` (type your own password if asked).
+2. Restart into the BIOS and switch Secure Boot back on (ASUS: **OS Type** → **Windows UEFI
+   mode**), then **F10**.
+3. A blue **Perform MOK management** screen appears (it needs a keyboard): **Enroll MOK** →
+   **Continue** → **Yes**, type the password **`universalblue`** (nothing shows while you type),
+   Enter, **Reboot**.
 
-This lets Secure Boot trust GameTDP OS's kernel. It's the same key Bazzite uses.
-
-If you missed the blue screen, or the PC shows *Security Violation* / *bad shim signature*
-instead of starting: open the BIOS, turn **Secure Boot off**, start GameTDP OS, run
-`ujust enroll-secure-boot-key` in Konsole, restart and do the steps above, then turn Secure Boot
-back on. (Some Windows games' anti-cheat needs Secure Boot on, so it's worth doing.)
+This lets Secure Boot trust GameTDP OS's kernel (the same key Bazzite uses), so both Windows and
+GameTDP OS start with Secure Boot on. Some Windows games' anti-cheat needs it on. A later BIOS
+update can switch this off again; if *bad shim signature* comes back, repeat this step.
 
 ### 7. First login
 
