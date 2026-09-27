@@ -38,6 +38,17 @@ jq -e '.transports.docker["ghcr.io/mircix/gametdp-os"][0].keyPath == "/etc/pki/c
     /etc/containers/policy.json >/dev/null && ok "signature policy"
 grep -q 'BEGIN PUBLIC KEY' /etc/pki/containers/gametdp-os.pub && ok "signing public key"
 
+# Repos switched off in dnf5 overrides must be off in the .repo files too (the ISO builder only reads those)
+enabled_in_files=$(awk '/^\[/ { id = substr($0, 2, length($0) - 2) } /^enabled[[:space:]]*=[[:space:]]*(1|true|True)/ { print id }' /etc/yum.repos.d/*.repo | sort -u)
+disabled_by_override=$(cat /etc/dnf/repos.override.d/*.repo 2>/dev/null |
+    awk '/^\[/ { id = substr($0, 2, length($0) - 2) } /^enabled[[:space:]]*=[[:space:]]*(0|false|False)/ { print id }' | sort -u)
+conflicts=$(comm -12 <(echo "$enabled_in_files") <(echo "$disabled_by_override") | grep -v '^$' || true)
+if [[ -n "$conflicts" ]]; then
+    echo "repos enabled in /etc/yum.repos.d but disabled by dnf5 overrides: $conflicts" >&2
+    exit 1
+fi
+ok "repo files agree with dnf5 overrides (enabled: $(echo "$enabled_in_files" | tr '\n' ' '))"
+
 KVER=$(ls /usr/lib/modules)
 lsinitrd -f usr/share/plymouth/themes/spinner/watermark.png "/usr/lib/modules/$KVER/initramfs.img" |
     cmp - /usr/share/plymouth/themes/spinner/watermark.png && ok "boot splash logo in initramfs"

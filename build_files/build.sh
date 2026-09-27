@@ -77,6 +77,20 @@ jq --arg repo "$IMAGE_REPO" \
     /etc/containers/policy.json >/tmp/policy.json
 cp /tmp/policy.json /etc/containers/policy.json
 
+### Package repos
+# bootc-image-builder (which makes the installer ISO) reads /etc/yum.repos.d but not dnf5's
+# repos.override.d, so repos Bazzite switched off there (terra-mesa) still look enabled to it and
+# break the ISO build. Write those "off" settings into the .repo files too; dnf5 already treats
+# them as off, so the installed system behaves the same.
+for override in /etc/dnf/repos.override.d/*.repo; do
+    [[ -e "$override" ]] || continue
+    awk '/^\[/ { id = substr($0, 2, length($0) - 2) } /^enabled[[:space:]]*=[[:space:]]*(0|false|False)/ { print id }' "$override"
+done | sort -u | while read -r id; do
+    for repo in /etc/yum.repos.d/*.repo; do
+        sed -i "/^\[${id}\]/,/^\[/ s/^enabled[[:space:]]*=[[:space:]]*\(1\|true\|True\)[[:space:]]*$/enabled=0/" "$repo"
+    done
+done
+
 ### Initramfs
 # The boot splash logo and os-release are baked into the initramfs, so rebuild it
 # (same dracut options Bazzite uses).
