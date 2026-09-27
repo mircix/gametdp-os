@@ -28,7 +28,9 @@ concurrency:
 jobs:
   build:
     name: Build installer ISO
-    runs-on: ubuntu-26.04
+    # Not 26.04: osbuild can't mount /dev in its sandbox there
+    # (https://github.com/ublue-os/image-template/issues/269)
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: read
