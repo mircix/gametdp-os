@@ -1,0 +1,3 @@
+docker:
+  ghcr.io/mircix/gametdp-os:
+    use-sigstore-attachments: true

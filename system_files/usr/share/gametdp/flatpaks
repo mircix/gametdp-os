@@ -1,0 +1,24 @@
+# GameTDP OS app set, installed system-wide from Flathub on first boot.
+# Each app is installed once: if you uninstall one it stays uninstalled.
+# New lines added in a future update get installed on the next boot.
+
+# Windows games
+app/com.heroicgameslauncher.hgl/x86_64/stable
+app/com.usebottles.bottles/x86_64/stable
+app/com.vysp3r.ProtonPlus/x86_64/stable
+app/com.github.Matoking.protontricks/x86_64/stable
+
+# Everyday apps (the set Bazzite's own installer adds)
+app/org.mozilla.firefox/x86_64/stable
+app/org.kde.gwenview/x86_64/stable
+app/org.kde.okular/x86_64/stable
+app/org.kde.kcalc/x86_64/stable
+app/org.kde.haruna/x86_64/stable
+app/io.github.DenysMb.Kontainer/x86_64/stable
+app/com.github.tchx84.Flatseal/x86_64/stable
+app/io.github.flattool.Warehouse/x86_64/stable
+app/org.gnome.Firmware/x86_64/stable
+
+# Performance overlay and post-processing for Flatpak games
+runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08
+runtime/org.freedesktop.Platform.VulkanLayer.vkBasalt/x86_64/25.08

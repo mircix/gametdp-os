@@ -1,0 +1,40 @@
+# USB installer (Anaconda) for GameTDP OS, built by .github/workflows/build-disk.yml.
+# The installer asks for disk, user and time zone; the %post steps below run after the copy.
+# (''' literal string: backslashes in the scripts are kept as-is.)
+
+[customizations.installer.kickstart]
+contents = '''
+%post --log=/var/log/gametdp-install-updates.log
+# Take updates from GameTDP OS on GitHub, accepting only images signed with its key
+bootc switch --mutate-in-place --enforce-container-sigpolicy --transport registry ghcr.io/mircix/gametdp-os:stable
+%end
+
+%post --log=/var/log/gametdp-install-secureboot.log
+# The kernel is signed with Universal Blue's key, which Secure Boot doesn't know yet.
+# Queue it for enrollment: on the first reboot a blue "MOK management" screen appears;
+# choose Enroll MOK > Continue > Yes and type the password: universalblue
+# (Same key and password as Bazzite. Later: `ujust enroll-secure-boot-key` does the same.)
+KEY=/etc/pki/akmods/certs/akmods-ublue.der
+if [ -d /sys/firmware/efi ] && [ -f "$KEY" ] && command -v mokutil >/dev/null 2>&1; then
+    mokutil --timeout -1 || :
+    printf 'universalblue\nuniversalblue\n' | mokutil --import "$KEY" || :
+else
+    echo "Skipped Secure Boot key enrollment (no EFI, key or mokutil)"
+fi
+%end
+'''
+
+[customizations.installer.modules]
+enable = [
+  "org.fedoraproject.Anaconda.Modules.Storage",
+  "org.fedoraproject.Anaconda.Modules.Runtime",
+  "org.fedoraproject.Anaconda.Modules.Network",
+  "org.fedoraproject.Anaconda.Modules.Security",
+  "org.fedoraproject.Anaconda.Modules.Services",
+  "org.fedoraproject.Anaconda.Modules.Users",
+  "org.fedoraproject.Anaconda.Modules.Timezone"
+]
+
+disable = [
+  "org.fedoraproject.Anaconda.Modules.Subscription",
+]

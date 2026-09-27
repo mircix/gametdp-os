@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+# Install the GameTDP OS app set (/usr/share/gametdp/flatpaks) from Flathub.
+# Apps that installed successfully are remembered and never reinstalled, so removing one sticks.
+# Exits non-zero if anything failed, so gametdp-apps.service retries later.
+
+set -uo pipefail
+
+LIST=/usr/share/gametdp/flatpaks
+STATE_DIR=/var/lib/gametdp
+DONE="$STATE_DIR/flatpaks-installed"
+
+mkdir -p "$STATE_DIR"
+touch "$DONE"
+
+flatpak remote-add --if-not-exists --system flathub /etc/flatpak/remotes.d/flathub.flatpakrepo || :
+flatpak remote-modify --system --enable flathub || :
+
+failed=0
+while read -r -u 3 ref; do
+    [[ -z "$ref" || "$ref" == \#* ]] && continue
+    grep -qxF -- "$ref" "$DONE" && continue
+    echo "Installing $ref"
+    if flatpak install --system --noninteractive --or-update flathub "$ref" </dev/null; then
+        echo "$ref" >>"$DONE"
+    else
+        echo "Could not install $ref (will retry)" >&2
+        failed=1
+    fi
+done 3<"$LIST"
+
+exit "$failed"

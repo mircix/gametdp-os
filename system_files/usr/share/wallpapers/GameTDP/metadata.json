@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "GameTDP OS"
+            }
+        ],
+        "Id": "GameTDP",
+        "License": "CC-BY-SA-4.0",
+        "Name": "GameTDP"
+    }
+}

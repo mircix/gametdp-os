@@ -1,0 +1,16 @@
+[Unit]
+Description=Install the GameTDP OS apps from Flathub (Firefox, Heroic, Bottles, ProtonPlus...)
+Wants=network-online.target
+After=network-online.target bazzite-flatpak-manager.service
+# Keep retrying for about an hour after boot (e.g. while Wi-Fi is being set up), then wait for the next boot
+StartLimitIntervalSec=2h
+StartLimitBurst=12
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/gametdp-apps
+Restart=on-failure
+RestartSec=5min
+
+[Install]
+WantedBy=multi-user.target
