@@ -73,7 +73,8 @@ USB stick, write.
 2. Tap the boot menu key while the PC starts: **F8** on most ASUS boards, **F11** on MSI and
    ASRock, **F12** on Gigabyte.
 3. Choose the entry that starts with **UEFI:** and names your USB stick.
-4. In the black menu that appears, choose the **Install** entry.
+4. In the black menu that appears, choose **Install GameTDP OS 44** (if the screen stays black
+   after that, restart and pick *Install GameTDP OS 44 in basic graphics mode*).
 
 Leave Secure Boot as it is; step 6 takes care of it.
 
