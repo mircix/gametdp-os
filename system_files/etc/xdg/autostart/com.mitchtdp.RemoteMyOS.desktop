@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=RemoteMyOS
+Comment=Keeps this PC reachable from your other devices (turn off in RemoteMyOS Settings)
+Exec=/usr/bin/remotemyos --hidden
+Icon=remotemyos
+Terminal=false
+NoDisplay=true
+X-KDE-autostart-after=panel
+X-GNOME-Autostart-enabled=true

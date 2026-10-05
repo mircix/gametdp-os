@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=RemoteMyOS
+GenericName=Remote Desktop
+Comment=Control this PC from your other computers, or control them from here
+Exec=/usr/bin/remotemyos %U
+Icon=remotemyos
+Terminal=false
+Categories=Network;RemoteAccess;
+Keywords=remote;desktop;anydesk;teamviewer;vnc;rdp;support;
+StartupWMClass=RemoteMyOS
+StartupNotify=true

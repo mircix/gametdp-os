@@ -60,3 +60,19 @@ while read -r ref; do
     flatpak remote-info --system flathub "$ref" </dev/null >/dev/null
     ok "on Flathub: $ref"
 done </usr/share/gametdp/flatpaks
+
+# RemoteMyOS: app, menu entry, autostart, and what screen sharing needs
+test -x /usr/lib/remotemyos/remotemyos && test "$(readlink -f /usr/bin/remotemyos)" = /usr/lib/remotemyos/remotemyos && ok "RemoteMyOS installed"
+/usr/lib/remotemyos/resources/bin/remotemyos-agent --version | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' && ok "RemoteMyOS engine runs"
+desktop-file-validate /usr/share/applications/com.mitchtdp.RemoteMyOS.desktop && ok "RemoteMyOS menu entry"
+grep -q -- '--hidden' /etc/xdg/autostart/com.mitchtdp.RemoteMyOS.desktop && ok "RemoteMyOS starts at login"
+test -s /usr/share/icons/hicolor/512x512/apps/remotemyos.png && ok "RemoteMyOS icon"
+gst-inspect-1.0 pipewiresrc >/dev/null && ok "GStreamer PipeWire screen capture"
+# The CPU encoder chain exactly as RemoteMyOS builds it (VA-API needs a GPU, so it can't be tried here)
+gst-launch-1.0 -q videotestsrc num-buffers=30 ! videorate drop-only=true ! 'video/x-raw(ANY),framerate=30/1' ! \
+    videoconvert ! videoscale ! video/x-raw,format=I420,width=640,height=360 ! \
+    openh264enc bitrate=4000000 rate-control=bitrate complexity=low gop-size=90 usage-type=screen multi-thread=4 ! \
+    h264parse config-interval=-1 ! rtph264pay config-interval=-1 mtu=1200 pt=96 aggregate-mode=zero-latency ! \
+    fakesink && ok "H.264 encoding (OpenH264) with RemoteMyOS's pipeline"
+if [[ -e /usr/lib64/gstreamer-1.0/libgstva.so ]]; then ok "VA-API GStreamer plugin (GPU encoding)"; else echo "note: no VA-API GStreamer plugin, RemoteMyOS will encode on the CPU"; fi
+if command -v wl-paste >/dev/null; then ok "wl-clipboard"; else echo "note: no wl-clipboard, RemoteMyOS uses Klipper for the clipboard"; fi
