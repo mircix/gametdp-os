@@ -76,3 +76,14 @@ gst-launch-1.0 -q videotestsrc num-buffers=30 ! videorate drop-only=true ! 'vide
     fakesink && ok "H.264 encoding (OpenH264) with RemoteMyOS's pipeline"
 if [[ -e /usr/lib64/gstreamer-1.0/libgstva.so ]]; then ok "VA-API GStreamer plugin (GPU encoding)"; else echo "note: no VA-API GStreamer plugin, RemoteMyOS will encode on the CPU"; fi
 if command -v wl-paste >/dev/null; then ok "wl-clipboard"; else echo "note: no wl-clipboard, RemoteMyOS uses Klipper for the clipboard"; fi
+# Start RemoteMyOS without a screen and make sure it can draw text: Electron's bundled fontconfig
+# can't read Fedora's font setup, finds no fonts and aborts (SkFontMgr ... Not implemented).
+timeout 25 /usr/bin/remotemyos --ozone-platform=headless --no-sandbox --profile /tmp/rmos-smoke \
+    --enable-logging=stderr >/tmp/rmos-smoke.log 2>&1 || true
+if grep -qE 'SkFontMgr|Could not find any font' /tmp/rmos-smoke.log; then
+    echo "RemoteMyOS can't find fonts:" >&2
+    tail -n 25 /tmp/rmos-smoke.log >&2
+    exit 1
+fi
+ok "RemoteMyOS starts and finds fonts (headless)"
+echo "--- RemoteMyOS headless log (last lines)"; tail -n 8 /tmp/rmos-smoke.log
