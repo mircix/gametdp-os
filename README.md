@@ -14,6 +14,8 @@ that GameTDP OS adds:
 
 - **More ways to install Windows games**: Heroic (Epic Games, GOG, Amazon) and Bottles (any
   Windows `.exe` or installer) are installed and pinned to the taskbar, next to Steam and Lutris.
+- **Remote desktop built in**: RemoteMyOS, an AnyDesk-style app that works on KDE Wayland, starts
+  with the desktop so you can see and control this PC from your Mac or Windows PC, at home or over the internet.
 - **Everyday apps on first boot**: Firefox, image viewer, PDF reader, video player, ProtonPlus
   (extra Proton versions), Protontricks and more.
 - **GameTDP look**: TDPlay-style logo on the start button, boot screen, About page and terminal,
@@ -130,6 +132,14 @@ run `ujust setup-boot-windows-steam`, which adds a "Boot Windows" tile to your S
 | Battle.net, EA app, Ubisoft Connect, Rockstar and others | Lutris (search the game or launcher and click *Install*) |
 | Any other Windows game or program (`setup.exe`) | Bottles: create a *Gaming* bottle and run the installer in it |
 
+**Reaching this PC from your other computers (RemoteMyOS).** RemoteMyOS starts with the desktop
+and sits in the system tray; its window shows this PC's 9-digit ID. On your Mac or Windows PC, install
+RemoteMyOS too, type that ID and click *Connect*. The first time, click **Set up now** under
+*Remote control permission* in RemoteMyOS on this PC and approve KDE's dialog with *Allow restoring*
+ticked; after that, connections start without asking. Set a password under *Unattended access* to
+connect when nobody is at the PC. To stop it starting with the desktop, switch off *Start RemoteMyOS
+when I log in* in its Settings.
+
 **Your Windows drives** appear in the file manager, so you can copy files from them. Don't run or
 install games *from* a Windows (NTFS) drive; install them on the GameTDP OS drive.
 
@@ -162,7 +172,8 @@ you when it does. Your PC keeps working, it just stops receiving updates. To res
 | Path | What it is |
 | --- | --- |
 | `Containerfile` | Starts from `ghcr.io/ublue-os/bazzite:stable` and runs `build_files/build.sh` |
-| `build_files/build.sh` | Branding, app installer service, update signing policy, initramfs rebuild |
+| `build_files/build.sh` | Branding, app installer service, RemoteMyOS, update signing policy, initramfs rebuild |
+| `build_files/remotemyos.env` | RemoteMyOS version and checksum (its Linux build is attached to this repo's `remotemyos-v*` release) |
 | `system_files/` | Files copied into the OS as-is (artwork, app list, services, `ujust` recipes) |
 | `branding/make_assets.py` | Renders the logo, wallpaper and boot-splash artwork into `system_files/` |
 | `disk_config/iso.toml` | USB installer settings: update source and Secure Boot key enrollment |

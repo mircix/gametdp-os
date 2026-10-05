@@ -67,6 +67,29 @@ grep -q 'GameTDP OS' "$MOTD"
 systemctl enable gametdp-apps.service
 echo 'import "/usr/share/ublue-os/just/96-gametdp.just"' >>/usr/share/ublue-os/justfile
 
+### RemoteMyOS: remote desktop (like AnyDesk) that works on KDE Wayland
+# The app goes to /usr/lib/remotemyos; its menu entry and login autostart come from system_files.
+# The .desktop file name is the app ID KDE uses to remember the remote-control permission.
+# shellcheck disable=SC1091
+source /ctx/remotemyos.env
+curl -fsSL --retry 3 -o /tmp/remotemyos.tar.gz \
+    "${REPO_URL}/releases/download/remotemyos-v${REMOTEMYOS_VERSION}/RemoteMyOS-${REMOTEMYOS_VERSION}-linux-x64.tar.gz"
+echo "${REMOTEMYOS_SHA256}  /tmp/remotemyos.tar.gz" | sha256sum -c -
+tar -xzf /tmp/remotemyos.tar.gz -C /tmp
+mkdir -p /usr/lib/remotemyos
+cp -a "/tmp/RemoteMyOS-${REMOTEMYOS_VERSION}-linux-x64/RemoteMyOS/." /usr/lib/remotemyos/
+chmod 0755 /usr/lib/remotemyos/remotemyos /usr/lib/remotemyos/resources/bin/remotemyos-agent
+ln -sf /usr/lib/remotemyos/remotemyos /usr/bin/remotemyos
+rm -rf /tmp/remotemyos.tar.gz "/tmp/RemoteMyOS-${REMOTEMYOS_VERSION}-linux-x64"
+# Sharing the screen needs GStreamer's PipeWire source and an H.264 encoder (VA-API on the GPU,
+# OpenH264 as the CPU fallback). Installed by file so dnf picks whichever package provides it.
+dnf5 -y install --enable-repo=fedora-cisco-openh264 --skip-unavailable \
+    /usr/lib64/gstreamer-1.0/libgstpipewire.so \
+    /usr/lib64/gstreamer-1.0/libgstva.so \
+    /usr/lib64/gstreamer-1.0/libgstopenh264.so \
+    /usr/bin/gst-launch-1.0 \
+    /usr/bin/wl-paste
+
 ### Updates: only accept GameTDP OS images signed with this repo's cosign key
 jq --arg repo "$IMAGE_REPO" \
     '.transports.docker[$repo] = [{
